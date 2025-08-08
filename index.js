@@ -34,11 +34,26 @@ function loadData(filePath) {
   if (!fs.existsSync(filePath)) return new Map();
   try {
     const raw = fs.readFileSync(filePath, 'utf8');
-    return new Map(JSON.parse(raw));
+    const obj = JSON.parse(raw);
+
+    // Jika data dalam bentuk array, bisa langsung jadi Map
+    if (Array.isArray(obj)) return new Map(obj);
+
+    // Jika data berupa object (key: value), ubah ke array [key, value] dulu
+    if (obj && typeof obj === 'object') {
+      return new Map(Object.entries(obj));
+    }
+
+    return new Map();
   } catch (e) {
     console.error(`❌  Gagal load file ${filePath}:`, e);
     return new Map();
   }
+}
+
+function saveData(filePath, map) {
+  const obj = Object.fromEntries(map);
+  fs.writeFileSync(filePath, JSON.stringify(obj, null, 2));
 }
 
 // Load seller dan buyer data
