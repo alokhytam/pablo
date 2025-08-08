@@ -3,11 +3,23 @@ require('dotenv').config();
 // Pastikan folder storage tersedia
 const path = require('path');
 const fs = require('fs');
+
+const { Client, GatewayIntentBits, Partials, Collection } = require('discord.js');
+const client = new Client({
+  intents: [
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMembers,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.MessageContent,
+    GatewayIntentBits.DirectMessages
+  ],
+  partials: [Partials.Channel]
+});
+
 const storagePath = path.join(__dirname, 'data', 'storage');
 if (!fs.existsSync(storagePath)) {
   fs.mkdirSync(storagePath, { recursive: true });
 }
-
 // Simpan ke client agar bisa dipakai semua fitur
 client.storagePath = storagePath;
 client.sellerDataFile = path.join(storagePath, 'sellerData.json');
@@ -38,18 +50,6 @@ process.on('unhandledRejection', (reason, promise) => {
 
 process.on('uncaughtException', (err) => {
   console.error('❌ Uncaught Exception:', err);
-});
-
-const { Client, GatewayIntentBits, Partials, Collection } = require('discord.js');
-const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMembers,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.MessageContent,
-    GatewayIntentBits.DirectMessages
-  ],
-  partials: [Partials.Channel]
 });
 
 // Load semua handler dan fitur
