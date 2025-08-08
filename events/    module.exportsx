@@ -1,0 +1,57 @@
+// events/messageCreate.js
+module.exports = {
+  name: 'messageCreate',
+  async execute(message, client) {
+    if (!message.guild || message.author.bot) return;
+
+    // Ganti prefix di sini dari ! ke $
+    const prefix = '$';
+
+    const commandPrefixes = ['add', 'close', 'remove']; // command khusus prefix $
+
+    if (message.content.startsWith(prefix)) {
+      const args = message.content.slice(prefix.length).trim().split(/ +/);
+      const commandName = args.shift().toLowerCase();
+
+      // Validasi command prefix
+      if (!commandPrefixes.includes(commandName)) return;
+
+      if (message.author.id !== '1269015630921728080') {
+        return message.reply('❌ Kamu tidak memiliki izin.');
+      }
+
+      const command = client.commands.get(commandName);
+      if (!command) return;
+
+      try {
+        await command.execute(client, message, args);
+      } catch (error) {
+        console.error(error);
+        message.reply('❌ Terjadi kesalahan saat menjalankan perintah.');
+      }
+    }
+
+    // Tambahan: Tangani !ban dan !timeout di luar prefix $
+    else if (message.content.startsWith('!')) {
+      const args = message.content.slice(1).trim().split(/ +/);
+      const commandName = args.shift().toLowerCase();
+
+      const allowed = ['ban', 'timeout']; // perintah yang pakai !
+      if (!allowed.includes(commandName)) return;
+
+      if (message.author.id !== '1269015630921728080') {
+        return message.reply('❌ Kamu tidak memiliki izin.');
+      }
+
+      const command = client.commands.get(commandName);
+      if (!command) return;
+
+      try {
+        await command.execute(client, message, args);
+      } catch (error) {
+        console.error(error);
+        message.reply('❌ Terjadi kesalahan saat menjalankan perintah.');
+      }
+    }
+  }
+};

@@ -1,0 +1,14 @@
+{
+  "messageId_123456789": {
+    "sellerId": "987654321",
+    "channelId": "111222333",
+    "productTitle": "Jasa ML Rank Booster",
+    "timestamp": 1691179238
+  },
+  "messageId_987654321": {
+    "sellerId": "123456789",
+    "channelId": "444555666",
+    "productTitle": "Top Up FF 1000 Diamond",
+    "timestamp": 1691179239
+  }
+}

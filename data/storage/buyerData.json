@@ -1,0 +1,10 @@
+{
+  "userId_555555": {
+    "keranjang": ["messageId_123456789", "messageId_987654321"],
+    "tanya": ["messageId_123456789"]
+  },
+  "userId_666666": {
+    "keranjang": [],
+    "tanya": ["messageId_987654321"]
+  }
+}

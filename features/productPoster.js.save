@@ -1,0 +1,138 @@
+const {
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder,
+  ModalBuilder,
+  TextInputBuilder,
+  TextInputStyle,
+  EmbedBuilder
+} = require('discord.js');
+
+const {
+  PROMO_CHANNEL_IDS,
+  CHANNEL_TITLES,
+  CHANNEL_COLORS,
+  defaultFooter
+} = require('../utils/constants');
+
+const embedSellerMap = new Map();
+const ALLOWED_CHANNELS = Object.keys(CHANNEL_TITLES);
+
+async function execute(client) {
+// Kirim sticky embed dan tombol posting ke setiap channel
+for (const channelId of ALLOWED_CHANNELS) {
+    const channel = await client.channels.fetch(channelId).catch(() => null);
+    if (!channel || !channel.isTextBased()) continue;
+
+    // Hapus pesan lama yang berisi tombol posting jika ada
+    const messages = await channel.messages.fetch({ limit: 10 }).catch(() => []);
+    const stickyMessage = messages.find(m => m.author.id === client.user.id && m.components.length);
+    if (stickyMessage) await stickyMessage.delete().catch(() => null);
+
+    // Kirim ulang tombol posting
+    const stickyEmbed = new EmbedBuilder()
+        .setTitle('📌 Posting Produk')
+        .setDescription('Klik tombol **Posting Produk** di bawah ini untuk memulai.')
+        .setColor('#9b59b6');
+    const postButton = new ActionRowBuilder().addComponents(
+        new ButtonBuilder()
+            .setCustomId(`postproduct_${channelId}`)
+            .setLabel('📝 Posting Produk')
+            .setStyle(ButtonStyle.Primary)
+    );
+    await channel.send({ embeds: [stickyEmbed], components: [postButton] });
+}
+}
+
+async function openPostModal(interaction) {
+  const modal = new ModalBuilder()
+    .setCustomId(`submitpost_${interaction.channel.id}`)
+    .setTitle('📝 Formulir Posting Produk');
+
+  const descInput = new TextInputBuilder()
+    .setCustomId('productDescription')
+    .setLabel('Deskripsi Singkat')
+    .setStyle(TextInputStyle.Paragraph)
+    .setRequired(true);
+
+  const priceInput = new TextInputBuilder()
+    .setCustomId('productPrice')
+    .setLabel('Harga Produk')
+    .setStyle(TextInputStyle.Short)
+    .setRequired(false); // boleh kosong
+
+  const row2 = new ActionRowBuilder().addComponents(descInput);
+  const row3 = new ActionRowBuilder().addComponents(priceInput);
+
+  modal.addComponents(row2, row3);
+
+  await interaction.showModal(modal);
+}
+module.exports = {
+  name: 'productPoster',
+  execute,
+  openPostModal,
+  embedSellerMap
+};
+module.exports.handleSubmitModal = async function handleSubmitModal(interaction) {
+  const modalData = interaction.fields;
+  const price = modalData.getTextInputValue('productPrice');
+  const description = modalData.getTextInputValue('productDescription');
+  const channelId = interaction.customId.split('_')[1];
+  const channelTitle = CHANNEL_TITLES[channelId];
+  const channelColor = CHANNEL_COLORS[channelId];
+
+   const embed = new EmbedBuilder()
+  .setTitle(channelTitle || '📦 Produk') // Judul dari CHANNEL_TITLES
+  .setColor(channelColor || '#9b59b6')
+  .setDescription([
+  '**__Deskripsi Produk:__**',
+  `\`\`\`${description || 'Tidak ada deskripsi'}\`\`\``,
+  '**__Harga:__**',
+  `\`\`\`${price || 'Tidak disebutkan'}\`\`\``,
+  '**Gunakan jasa midman XIOO agar terhindar dari penipuan.**'
+].join('\n'))
+  .setFooter(defaultFooter);
+
+const row1 = new ActionRowBuilder().addComponents(
+  new ButtonBuilder().setCustomId('buy').setLabel('💸 Beli').setStyle(ButtonStyle.Success),
+  new ButtonBuilder().setCustomId('ask').setLabel('💬 Tanya').setStyle(ButtonStyle.Secondary),
+  new ButtonBuilder().setCustomId('delete').setLabel('🗑 Hapus').setStyle(ButtonStyle.Danger)
+);
+
+const row2 = new ActionRowBuilder().addComponents(
+  new ButtonBuilder().setCustomId('dummy_rtm').setLabel('RTM').setStyle(ButtonStyle.Secondary).setDisabled(true),
+  new ButtonBuilder().setCustomId('cart').setLabel('🧺 Keranjang').setStyle(ButtonStyle.Secondary),
+  new ButtonBuilder().setCustomId('dummy_xioo').setLabel('XIOO').setStyle(ButtonStyle.Secondary).setDisabled(true)
+);
+
+const posted = await interaction.channel.send({ embeds: [embed], components: [row1, row2] });
+const sellerId = interaction.user.id;
+embedSellerMap.set(posted.id, sellerId);
+
+// 🔻 Hapus tombol "Posting Produk" lama di atas
+const messages = await interaction.channel.messages.fetch({ limit: 10 }).catch(() => []);
+const stickyMessage = messages.find(m =>
+  m.author.id === interaction.client.user.id &&
+  m.components.length &&
+  m.embeds.length &&
+  m.embeds[0]?.title?.includes('📌 Posting Produk')
+);
+if (stickyMessage) await stickyMessage.delete().catch(() => null);
+
+// 🔻 Kirim ulang tombol "Posting Produk" di bawah postingan
+const stickyEmbed = new EmbedBuilder()
+  .setTitle('📌 Posting Produk')
+  .setDescription('Klik tombol **Posting Produk** di bawah ini untuk memulai.')
+  .setColor('#9b59b6');
+
+const postButton = new ActionRowBuilder().addComponents(
+  new ButtonBuilder()
+    .setCustomId(`postproduct_${interaction.channel.id}`)
+    .setLabel('📝 Posting Produk')
+    .setStyle(ButtonStyle.Primary)
+);
+
+await interaction.channel.send({ embeds: [stickyEmbed], components: [postButton] });
+  await interaction.reply({ content: '✅ Produk berhasil diposting!', ephemeral: true });
+};

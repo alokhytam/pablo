@@ -1,0 +1,73 @@
+const {
+  EmbedBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ActionRowBuilder
+} = require('discord.js');
+const {
+  PROMO_CHANNEL_IDS,
+  CHANNEL_TITLES,
+  CHANNEL_COLORS,
+  defaultFooter
+} = require('./constants');
+
+module.exports = (client) => {
+  client.on('messageCreate', async (message) => {
+    if (message.author.bot || !message.guild) return;
+    if (!PROMO_CHANNEL_IDS.includes(message.channelId)) return;
+
+    const channelTitle = CHANNEL_TITLES[message.channelId];
+    if (!channelTitle) return;
+
+    const cleanContent = message.cleanContent;
+
+    const embed = new EmbedBuilder()
+      .setTitle(`${channelTitle}`)
+      .setDescription(`**__Deskripsi Produk:__**\n\n\`\`\`\n${cleanContent}\n\`\`\`\n**Gunakan jasa *Midman* agar terhindar dari penipuan.**`)
+      .setColor(CHANNEL_COLORS[message.channelId] || 0x2ecc71)
+      .setFooter({
+  text: '「✗」 RTM XIOO SAMP',
+  iconURL: `https://cdn.discordapp.com/attachments/1393216105908011020/1398938677966798868/Proyek_Baru_6_B1A697E_11zon.jpg?ex=68872eab&is=6885dd2b&hm=ab3b21acfd5434ff8644d1f990bed240c8444ce9e040bfadd2ee5e1ceece7321&`
+});
+
+    const buyButton = new ButtonBuilder()
+      .setCustomId(`buy_${message.author.id}`)
+      .setLabel('💳Beli')
+      .setStyle(ButtonStyle.Primary);
+
+    const askButton = new ButtonBuilder()
+      .setCustomId(`minat_${message.author.id}`)
+      .setLabel('🗨️Tanya')
+      .setStyle(ButtonStyle.Success);
+
+   const cartButton = new ButtonBuilder()
+      .setCustomId(`cart_${message.author.id}`)
+      .setLabel('🛒Keranjang')
+      .setStyle(ButtonStyle.Secondary);
+
+    const deleteButton = new ButtonBuilder()
+      .setCustomId(`delete_${message.author.id}`)
+      .setLabel('🧹Hapus')
+      .setStyle(ButtonStyle.Secondary);
+
+    const row1 = new ActionRowBuilder().addComponents(buyButton, askButton, deleteButton);
+    const row2 = new ActionRowBuilder().addComponents(
+    new ButtonBuilder()
+    .setCustomId(`dummy_rtm_${message.author.id}`)
+    .setLabel('RTM')
+    .setStyle(ButtonStyle.Secondary)
+    .setDisabled(true),
+    new ButtonBuilder()
+    .setCustomId(`cart_${message.author.id}`)
+    .setLabel('🛒 Keranjang')
+    .setStyle(ButtonStyle.Secondary),
+    new ButtonBuilder()
+    .setCustomId(`dummy_xioo_${message.author.id}`)
+    .setLabel('XIOO')
+    .setStyle(ButtonStyle.Secondary)
+    .setDisabled(true)
+);
+    await message.delete().catch(() => {});
+    await message.channel.send({ embeds: [embed], components: [row1, row2] });
+  });
+};

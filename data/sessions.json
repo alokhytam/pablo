@@ -1,0 +1,31 @@
+{
+  "891958417005092914-1269015630921728080-1401952386083197030": {
+    "buyer": {
+      "id": "1269015630921728080"
+    },
+    "seller": {
+      "id": "891958417005092914"
+    },
+    "title": "🛍️RTM JGRP",
+    "productDesc": "\nm\n",
+    "history": [],
+    "remainingTime": -1754283787021
+  },
+  "1071606266163626055-1376217786388447402-1400467737251414159": {
+    "buyer": {
+      "id": "1376217786388447402"
+    },
+    "seller": {
+      "id": "1071606266163626055"
+    },
+    "title": "🛍️RTM CPRP",
+    "productDesc": "\nSELL UCP CPRP\nDC/CS ON\nLV 85+ \nUIC 100K\nH SMALL BERGATE LS\nSULTAN, FREWEY \nSG 1 AMMO 30\n   45K NEGOIN\n",
+    "history": [
+      {
+        "buyer": "[00.03.22] Anda : boleh nego?",
+        "seller": "[00.03.22] Buyer : boleh nego?"
+      }
+    ],
+    "remainingTime": -1754282519381
+  }
+}
