@@ -2,6 +2,7 @@ require('dotenv').config();
 
 // Pastikan folder storage tersedia
 const path = require('path');
+const fs = require('fs');
 const storagePath = path.join(__dirname, 'data', 'storage');
 if (!fs.existsSync(storagePath)) {
   fs.mkdirSync(storagePath, { recursive: true });
@@ -50,9 +51,6 @@ const client = new Client({
   ],
   partials: [Partials.Channel]
 });
-
-//simpan data
-const fs = require('fs');
 
 // Load semua handler dan fitur
 try {
