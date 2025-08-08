@@ -52,7 +52,6 @@ const client = new Client({
 });
 
 //simpan data
-const path = require('path');
 const fs = require('fs');
 
 // Load semua handler dan fitur
