@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 // Pastikan folder storage tersedia
+const path = require('path');
 const storagePath = path.join(__dirname, 'data', 'storage');
 if (!fs.existsSync(storagePath)) {
   fs.mkdirSync(storagePath, { recursive: true });
